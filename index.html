@@ -1,0 +1,888 @@
+
+<h2 class="sr-only">College Database Management System — full-stack app with admin and student login portals</h2>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0f1b2d;--navy2:#162236;--navy3:#1e2f45;
+  --accent:#3b82f6;--accent2:#60a5fa;--gold:#f59e0b;
+  --green:#10b981;--red:#ef4444;--purple:#8b5cf6;
+  --text1:#f0f4f8;--text2:#94a3b8;--text3:#64748b;
+  --border:#1e3a5f;--card:#162236;--input:#0f1b2d;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--navy);color:var(--text1);min-height:600px}
+.screen{display:none;min-height:600px}
+.screen.active{display:flex;flex-direction:column}
+.btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#2563eb}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{background:#dc2626}
+.btn-success{background:var(--green);color:#fff}
+.btn-success:hover{background:#059669}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--navy3)}
+.btn-gold{background:var(--gold);color:#000}
+.btn-gold:hover{background:#d97706}
+input,select,textarea{width:100%;padding:9px 12px;background:var(--input);border:1px solid var(--border);border-radius:8px;color:var(--text1);font-size:14px;outline:none}
+input:focus,select:focus{border-color:var(--accent)}
+select option{background:var(--navy)}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-blue{background:#1e3a6e;color:var(--accent2)}
+.badge-green{background:#064e3b;color:#34d399}
+.badge-red{background:#7f1d1d;color:#fca5a5}
+.badge-gold{background:#451a03;color:#fcd34d}
+.badge-purple{background:#3b0764;color:#c4b5fd}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:10px 12px;text-align:left;color:var(--text2);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid #0d1f33;vertical-align:middle}
+tr:hover td{background:#0d1f33}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.stat-card{background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.stat-val{font-size:28px;font-weight:700;margin-bottom:4px}
+.stat-lbl{font-size:12px;color:var(--text2)}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.modal{background:var(--navy2);border:1px solid var(--border);border-radius:14px;padding:24px;width:100%;max-width:480px;max-height:80vh;overflow-y:auto}
+.modal-title{font-size:18px;font-weight:700;margin-bottom:20px;color:var(--text1)}
+.form-row{margin-bottom:14px}
+.form-label{font-size:12px;color:var(--text2);margin-bottom:6px;display:block;font-weight:600}
+.sidebar{width:200px;background:var(--navy2);border-right:1px solid var(--border);padding:16px 0;flex-shrink:0;display:flex;flex-direction:column}
+.nav-item{padding:10px 16px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);border-radius:8px;margin:2px 8px;transition:all .15s;display:flex;align-items:center;gap:10px}
+.nav-item:hover{background:var(--navy3);color:var(--text1)}
+.nav-item.active{background:var(--accent);color:#fff}
+.topbar{height:56px;background:var(--navy2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.content{flex:1;overflow-y:auto;padding:20px;background:var(--navy)}
+.section{display:none}
+.section.active{display:block}
+.avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.avatar-blue{background:#1e3a6e;color:var(--accent2)}
+.avatar-green{background:#064e3b;color:#34d399}
+.avatar-purple{background:#3b0764;color:#c4b5fd}
+.alert{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:12px}
+.alert-success{background:#064e3b;color:#34d399;border:1px solid #065f46}
+.alert-error{background:#7f1d1d;color:#fca5a5;border:1px solid #991b1b}
+.tab{padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);transition:all .15s}
+.tab.active{background:var(--accent);color:#fff}
+.progress-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;transition:width .3s}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:12px;background:var(--navy3);border:1px solid var(--border);color:var(--text2);cursor:pointer}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.grade-a{color:#34d399;font-weight:700}
+.grade-b{color:#60a5fa;font-weight:700}
+.grade-c{color:#fcd34d;font-weight:700}
+.grade-d{color:#f87171;font-weight:700}
+.grade-f{color:#ef4444;font-weight:700}
+</style>
+
+<!-- LOGIN SCREEN -->
+<div id="screen-login" class="screen active" style="align-items:center;justify-content:center;background:linear-gradient(135deg,#060d16 0%,#0f1b2d 50%,#0a1628 100%);min-height:600px">
+  <div style="width:100%;max-width:420px;padding:20px">
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="width:64px;height:64px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:16px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:28px">🎓</div>
+      <h1 style="font-size:24px;font-weight:800;margin-bottom:6px">EduCore</h1>
+      <p style="color:var(--text2);font-size:14px">College Database Management System</p>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:24px;background:var(--navy2);padding:4px;border-radius:10px">
+      <div class="tab active" id="tab-admin" style="flex:1;text-align:center" onclick="switchLoginTab('admin')">Admin</div>
+      <div class="tab" id="tab-student" style="flex:1;text-align:center" onclick="switchLoginTab('student')">Student</div>
+    </div>
+    <div class="card" style="padding:24px">
+      <div id="login-alert" style="display:none"></div>
+      <div class="form-row">
+        <label class="form-label">Username / Student ID</label>
+        <input type="text" id="login-user" placeholder="Enter username..." value="admin">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Password</label>
+        <input type="password" id="login-pass" placeholder="Enter password..." value="admin123">
+      </div>
+      <div id="login-hint" style="font-size:12px;color:var(--text2);margin-bottom:14px;padding:10px;background:var(--navy3);border-radius:6px">
+        Admin: admin / admin123
+      </div>
+      <button class="btn btn-primary" style="width:100%;padding:12px" onclick="doLogin()">Sign In →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="screen-admin" class="screen" style="flex-direction:row;min-height:600px">
+  <div class="sidebar">
+    <div style="padding:12px 16px;margin-bottom:8px">
+      <div style="font-size:16px;font-weight:800;color:var(--accent)">🎓 EduCore</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:2px">Admin Portal</div>
+    </div>
+    <div class="nav-item active" onclick="adminNav('dashboard')" id="nav-dashboard">📊 Dashboard</div>
+    <div class="nav-item" onclick="adminNav('students')" id="nav-students">👥 Students</div>
+    <div class="nav-item" onclick="adminNav('courses')" id="nav-courses">📚 Courses</div>
+    <div class="nav-item" onclick="adminNav('faculty')" id="nav-faculty">👨‍🏫 Faculty</div>
+    <div class="nav-item" onclick="adminNav('enrollments')" id="nav-enrollments">📋 Enrollments</div>
+    <div class="nav-item" onclick="adminNav('grades')" id="nav-grades">📝 Grades</div>
+    <div class="nav-item" onclick="adminNav('fees')" id="nav-fees">💰 Fees</div>
+    <div style="flex:1"></div>
+    <div class="nav-item" onclick="logout()" style="margin-bottom:8px">🚪 Logout</div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+    <div class="topbar">
+      <div style="font-size:16px;font-weight:700;flex:1" id="admin-page-title">Dashboard</div>
+      <button class="btn btn-primary" style="padding:7px 14px;font-size:13px" id="admin-action-btn" onclick="adminAction()">+ Add Student</button>
+      <div class="avatar avatar-blue" title="Admin">AD</div>
+    </div>
+    <div class="content">
+      <!-- DASHBOARD -->
+      <div id="sec-dashboard" class="section active">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+          <div class="stat-card"><div class="stat-val" style="color:var(--accent)" id="dash-students">0</div><div class="stat-lbl">Total Students</div></div>
+          <div class="stat-card"><div class="stat-val" style="color:var(--green)" id="dash-courses">0</div><div class="stat-lbl">Active Courses</div></div>
+          <div class="stat-card"><div class="stat-val" style="color:var(--gold)" id="dash-faculty">0</div><div class="stat-lbl">Faculty Members</div></div>
+          <div class="stat-card"><div class="stat-val" style="color:var(--purple)" id="dash-enrollments">0</div><div class="stat-lbl">Enrollments</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-bottom:16px">
+          <div class="card">
+            <div style="font-size:14px;font-weight:700;margin-bottom:14px">Recent Enrollments</div>
+            <div id="dash-recent-enroll"></div>
+          </div>
+          <div class="card">
+            <div style="font-size:14px;font-weight:700;margin-bottom:14px">Department Distribution</div>
+            <div id="dash-dept-dist"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:14px;font-weight:700;margin-bottom:14px">Fee Collection Overview</div>
+          <div id="dash-fees-overview"></div>
+        </div>
+      </div>
+
+      <!-- STUDENTS -->
+      <div id="sec-students" class="section">
+        <div style="display:flex;gap:10px;margin-bottom:14px">
+          <input type="text" id="search-students" placeholder="Search students..." style="max-width:280px" oninput="renderStudents()">
+          <select id="filter-dept" onchange="renderStudents()" style="max-width:160px">
+            <option value="">All Departments</option>
+          </select>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <table><thead><tr><th>Student</th><th>ID</th><th>Department</th><th>Year</th><th>CGPA</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="students-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <!-- COURSES -->
+      <div id="sec-courses" class="section">
+        <div class="card" style="padding:0;overflow:hidden">
+          <table><thead><tr><th>Course</th><th>Code</th><th>Department</th><th>Credits</th><th>Faculty</th><th>Seats</th><th>Actions</th></tr></thead>
+          <tbody id="courses-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <!-- FACULTY -->
+      <div id="sec-faculty" class="section">
+        <div class="card" style="padding:0;overflow:hidden">
+          <table><thead><tr><th>Faculty</th><th>ID</th><th>Department</th><th>Designation</th><th>Courses</th><th>Actions</th></tr></thead>
+          <tbody id="faculty-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <!-- ENROLLMENTS -->
+      <div id="sec-enrollments" class="section">
+        <div class="card" style="padding:0;overflow:hidden">
+          <table><thead><tr><th>Student</th><th>Course</th><th>Semester</th><th>Enrolled On</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="enrollments-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <!-- GRADES -->
+      <div id="sec-grades" class="section">
+        <div style="display:flex;gap:10px;margin-bottom:14px">
+          <select id="grade-filter-course" onchange="renderGrades()" style="max-width:240px">
+            <option value="">All Courses</option>
+          </select>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <table><thead><tr><th>Student</th><th>Course</th><th>Marks</th><th>Grade</th><th>Semester</th><th>Actions</th></tr></thead>
+          <tbody id="grades-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <!-- FEES -->
+      <div id="sec-fees" class="section">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+          <div class="stat-card"><div class="stat-val" style="color:var(--green)" id="fee-collected">0</div><div class="stat-lbl">Collected (₹)</div></div>
+          <div class="stat-card"><div class="stat-val" style="color:var(--red)" id="fee-pending">0</div><div class="stat-lbl">Pending (₹)</div></div>
+          <div class="stat-card"><div class="stat-val" style="color:var(--accent2)" id="fee-students">0</div><div class="stat-lbl">Students</div></div>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <table><thead><tr><th>Student</th><th>Amount (₹)</th><th>Due Date</th><th>Paid Date</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="fees-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STUDENT PORTAL -->
+<div id="screen-student" class="screen" style="flex-direction:row;min-height:600px">
+  <div class="sidebar">
+    <div style="padding:12px 16px;margin-bottom:8px">
+      <div style="font-size:16px;font-weight:800;color:var(--green)">🎓 EduCore</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:2px">Student Portal</div>
+    </div>
+    <div class="nav-item active" onclick="studentNav('profile')" id="snav-profile">👤 My Profile</div>
+    <div class="nav-item" onclick="studentNav('courses')" id="snav-courses">📚 My Courses</div>
+    <div class="nav-item" onclick="studentNav('grades')" id="snav-grades">📝 My Grades</div>
+    <div class="nav-item" onclick="studentNav('fees')" id="snav-fees">💳 My Fees</div>
+    <div class="nav-item" onclick="studentNav('timetable')" id="snav-timetable">🗓️ Timetable</div>
+    <div style="flex:1"></div>
+    <div class="nav-item" onclick="logout()" style="margin-bottom:8px">🚪 Logout</div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+    <div class="topbar">
+      <div style="font-size:16px;font-weight:700;flex:1" id="student-page-title">My Profile</div>
+      <div style="font-size:13px;color:var(--text2)" id="student-topbar-name"></div>
+      <div class="avatar avatar-green" id="student-avatar-topbar">ST</div>
+    </div>
+    <div class="content">
+      <!-- PROFILE -->
+      <div id="ssec-profile" class="section active">
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:start">
+          <div class="card" style="width:180px;text-align:center">
+            <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700" id="s-avatar-big">S</div>
+            <div style="font-size:15px;font-weight:700" id="s-name"></div>
+            <div style="font-size:12px;color:var(--text2);margin-top:4px" id="s-id-disp"></div>
+            <div style="margin-top:10px" id="s-status-badge"></div>
+          </div>
+          <div class="card">
+            <div style="font-size:14px;font-weight:700;margin-bottom:16px">Academic Information</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" id="s-info-grid"></div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px" id="s-stats-row"></div>
+      </div>
+      <!-- MY COURSES -->
+      <div id="ssec-courses" class="section">
+        <div class="card" style="padding:0;overflow:hidden">
+          <table><thead><tr><th>Course</th><th>Code</th><th>Credits</th><th>Faculty</th><th>Schedule</th><th>Status</th></tr></thead>
+          <tbody id="s-courses-tbody"></tbody></table>
+        </div>
+      </div>
+      <!-- MY GRADES -->
+      <div id="ssec-grades" class="section">
+        <div class="card" style="margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:22px;font-weight:800" id="s-cgpa"></div><div style="font-size:12px;color:var(--text2)">Cumulative GPA</div></div>
+            <div style="width:120px"><div style="font-size:12px;color:var(--text2);margin-bottom:6px">Performance</div><div class="progress-bar"><div class="progress-fill" id="s-gpa-bar" style="background:var(--green)"></div></div></div>
+          </div>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <table><thead><tr><th>Course</th><th>Marks</th><th>Grade</th><th>Points</th><th>Semester</th></tr></thead>
+          <tbody id="s-grades-tbody"></tbody></table>
+        </div>
+      </div>
+      <!-- MY FEES -->
+      <div id="ssec-fees" class="section">
+        <div id="s-fees-content"></div>
+      </div>
+      <!-- TIMETABLE -->
+      <div id="ssec-timetable" class="section">
+        <div id="s-timetable-content"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div id="modal-overlay" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-box">
+    <div class="modal-title" id="modal-title">Modal</div>
+    <div id="modal-body"></div>
+    <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end" id="modal-footer"></div>
+  </div>
+</div>
+
+<script>
+const DB = {
+  students:[
+    {id:'STU001',name:'Arjun Sharma',email:'arjun@college.edu',phone:'9876543210',dept:'Computer Science',year:3,cgpa:8.7,dob:'2002-05-14',address:'Chennai, TN',status:'Active',password:'stu001'},
+    {id:'STU002',name:'Priya Nair',email:'priya@college.edu',phone:'9876543211',dept:'Electronics',year:2,cgpa:9.1,dob:'2003-08-22',address:'Coimbatore, TN',status:'Active',password:'stu002'},
+    {id:'STU003',name:'Rahul Verma',email:'rahul@college.edu',phone:'9876543212',dept:'Mechanical',year:4,cgpa:7.4,dob:'2001-03-10',address:'Mumbai, MH',status:'Active',password:'stu003'},
+    {id:'STU004',name:'Sneha Krishnan',email:'sneha@college.edu',phone:'9876543213',dept:'Computer Science',year:1,cgpa:8.2,dob:'2004-11-30',address:'Bangalore, KA',status:'Active',password:'stu004'},
+    {id:'STU005',name:'Vikram Patel',email:'vikram@college.edu',phone:'9876543214',dept:'Civil',year:3,cgpa:6.9,dob:'2002-07-18',address:'Ahmedabad, GJ',status:'Inactive',password:'stu005'},
+    {id:'STU006',name:'Divya Menon',email:'divya@college.edu',phone:'9876543215',dept:'Electronics',year:4,cgpa:9.4,dob:'2001-01-05',address:'Kochi, KL',status:'Active',password:'stu006'},
+  ],
+  courses:[
+    {id:'CS101',name:'Data Structures',dept:'Computer Science',credits:4,faculty:'FAC001',seats:60,enrolled:52,schedule:'Mon/Wed 9am'},
+    {id:'CS202',name:'Database Systems',dept:'Computer Science',credits:3,faculty:'FAC001',seats:55,enrolled:48,schedule:'Tue/Thu 11am'},
+    {id:'CS303',name:'Machine Learning',dept:'Computer Science',credits:4,faculty:'FAC002',seats:45,enrolled:39,schedule:'Mon/Wed 2pm'},
+    {id:'EC101',name:'Circuit Theory',dept:'Electronics',credits:4,faculty:'FAC003',seats:60,enrolled:57,schedule:'Mon/Wed 10am'},
+    {id:'EC202',name:'Signal Processing',dept:'Electronics',credits:3,faculty:'FAC003',seats:50,enrolled:44,schedule:'Tue/Thu 2pm'},
+    {id:'ME101',name:'Thermodynamics',dept:'Mechanical',credits:4,faculty:'FAC004',seats:55,enrolled:50,schedule:'Fri 9am-1pm'},
+    {id:'CV101',name:'Fluid Mechanics',dept:'Civil',credits:4,faculty:'FAC005',seats:50,enrolled:43,schedule:'Tue/Thu 9am'},
+  ],
+  faculty:[
+    {id:'FAC001',name:'Dr. Ramesh Kumar',dept:'Computer Science',designation:'Professor',courses:['CS101','CS202'],email:'ramesh@college.edu'},
+    {id:'FAC002',name:'Dr. Anita Singh',dept:'Computer Science',designation:'Assoc. Professor',courses:['CS303'],email:'anita@college.edu'},
+    {id:'FAC003',name:'Dr. Suresh Babu',dept:'Electronics',designation:'Professor',courses:['EC101','EC202'],email:'suresh@college.edu'},
+    {id:'FAC004',name:'Dr. Kavitha Raju',dept:'Mechanical',designation:'Assoc. Professor',courses:['ME101'],email:'kavitha@college.edu'},
+    {id:'FAC005',name:'Dr. Murugan S',dept:'Civil',designation:'Asst. Professor',courses:['CV101'],email:'murugan@college.edu'},
+  ],
+  enrollments:[
+    {id:'ENR001',studentId:'STU001',courseId:'CS101',semester:'2024-Jan',date:'2024-01-10',status:'Active'},
+    {id:'ENR002',studentId:'STU001',courseId:'CS202',semester:'2024-Jan',date:'2024-01-10',status:'Active'},
+    {id:'ENR003',studentId:'STU001',courseId:'CS303',semester:'2024-Jun',date:'2024-06-05',status:'Active'},
+    {id:'ENR004',studentId:'STU002',courseId:'EC101',semester:'2024-Jan',date:'2024-01-11',status:'Active'},
+    {id:'ENR005',studentId:'STU002',courseId:'EC202',semester:'2024-Jun',date:'2024-06-06',status:'Active'},
+    {id:'ENR006',studentId:'STU003',courseId:'ME101',semester:'2024-Jan',date:'2024-01-09',status:'Active'},
+    {id:'ENR007',studentId:'STU004',courseId:'CS101',semester:'2024-Jun',date:'2024-06-04',status:'Active'},
+    {id:'ENR008',studentId:'STU006',courseId:'EC101',semester:'2024-Jan',date:'2024-01-12',status:'Active'},
+    {id:'ENR009',studentId:'STU006',courseId:'EC202',semester:'2024-Jun',date:'2024-06-07',status:'Active'},
+    {id:'ENR010',studentId:'STU005',courseId:'CV101',semester:'2024-Jan',date:'2024-01-08',status:'Dropped'},
+  ],
+  grades:[
+    {id:'GRD001',studentId:'STU001',courseId:'CS101',marks:87,grade:'A',points:9,semester:'2024-Jan'},
+    {id:'GRD002',studentId:'STU001',courseId:'CS202',marks:82,grade:'B+',points:8,semester:'2024-Jan'},
+    {id:'GRD003',studentId:'STU001',courseId:'CS303',marks:91,grade:'A+',points:10,semester:'2024-Jun'},
+    {id:'GRD004',studentId:'STU002',courseId:'EC101',marks:93,grade:'A+',points:10,semester:'2024-Jan'},
+    {id:'GRD005',studentId:'STU002',courseId:'EC202',marks:88,grade:'A',points:9,semester:'2024-Jun'},
+    {id:'GRD006',studentId:'STU003',courseId:'ME101',marks:74,grade:'B',points:7,semester:'2024-Jan'},
+    {id:'GRD007',studentId:'STU006',courseId:'EC101',marks:95,grade:'A+',points:10,semester:'2024-Jan'},
+    {id:'GRD008',studentId:'STU006',courseId:'EC202',marks:92,grade:'A+',points:10,semester:'2024-Jun'},
+  ],
+  fees:[
+    {id:'FEE001',studentId:'STU001',amount:75000,dueDate:'2024-07-31',paidDate:'2024-07-15',status:'Paid'},
+    {id:'FEE002',studentId:'STU002',amount:80000,dueDate:'2024-07-31',paidDate:'2024-07-20',status:'Paid'},
+    {id:'FEE003',studentId:'STU003',amount:70000,dueDate:'2024-07-31',paidDate:null,status:'Pending'},
+    {id:'FEE004',studentId:'STU004',amount:75000,dueDate:'2024-07-31',paidDate:null,status:'Pending'},
+    {id:'FEE005',studentId:'STU005',amount:72000,dueDate:'2024-07-31',paidDate:null,status:'Overdue'},
+    {id:'FEE006',studentId:'STU006',amount:80000,dueDate:'2024-07-31',paidDate:'2024-07-10',status:'Paid'},
+  ],
+  adminCredentials:{username:'admin',password:'admin123'},
+  currentUser:null,
+  currentRole:null,
+};
+let loginTab='admin';
+
+function switchLoginTab(tab){
+  loginTab=tab;
+  document.getElementById('tab-admin').classList.toggle('active',tab==='admin');
+  document.getElementById('tab-student').classList.toggle('active',tab==='student');
+  if(tab==='admin'){
+    document.getElementById('login-user').value='admin';
+    document.getElementById('login-pass').value='admin123';
+    document.getElementById('login-hint').textContent='Admin: admin / admin123';
+  } else {
+    document.getElementById('login-user').value='STU001';
+    document.getElementById('login-pass').value='stu001';
+    document.getElementById('login-hint').textContent='Try: STU001 / stu001  or  STU002 / stu002';
+  }
+}
+
+function showAlert(id,type,msg){
+  const el=document.getElementById(id);
+  el.className='alert alert-'+type;
+  el.textContent=msg;el.style.display='block';
+  setTimeout(()=>el.style.display='none',3000);
+}
+
+function doLogin(){
+  const u=document.getElementById('login-user').value.trim();
+  const p=document.getElementById('login-pass').value.trim();
+  if(loginTab==='admin'){
+    if(u===DB.adminCredentials.username && p===DB.adminCredentials.password){
+      DB.currentRole='admin';
+      showScreen('admin');
+      renderDashboard();
+    } else showAlert('login-alert','error','Invalid admin credentials');
+  } else {
+    const stu=DB.students.find(s=>s.id===u && s.password===p);
+    if(stu){DB.currentUser=stu;DB.currentRole='student';showScreen('student');renderStudentPortal();}
+    else showAlert('login-alert','error','Invalid student ID or password');
+  }
+}
+
+function showScreen(name){
+  ['login','admin','student'].forEach(s=>{
+    document.getElementById('screen-'+s).classList.toggle('active',s===name);
+  });
+}
+
+function logout(){DB.currentUser=null;DB.currentRole=null;showScreen('login');}
+
+function adminNav(section){
+  const titles={dashboard:'Dashboard',students:'Student Management',courses:'Course Management',faculty:'Faculty Management',enrollments:'Enrollment Management',grades:'Grade Management',fees:'Fee Management'};
+  const actions={dashboard:'',students:'+ Add Student',courses:'+ Add Course',faculty:'+ Add Faculty',enrollments:'+ New Enrollment',grades:'+ Add Grade',fees:'+ Add Fee Record'};
+  document.getElementById('admin-page-title').textContent=titles[section];
+  const btn=document.getElementById('admin-action-btn');
+  btn.textContent=actions[section];btn.style.display=actions[section]?'':'none';
+  btn.onclick=()=>adminAction(section);
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('nav-'+section).classList.add('active');
+  document.querySelectorAll('#screen-admin .section').forEach(el=>el.classList.remove('active'));
+  document.getElementById('sec-'+section).classList.add('active');
+  if(section==='students')renderStudents();
+  if(section==='courses')renderCourses();
+  if(section==='faculty')renderFaculty();
+  if(section==='enrollments')renderEnrollments();
+  if(section==='grades')renderGrades();
+  if(section==='fees')renderFees();
+}
+
+function adminAction(section){
+  const s=section||document.querySelector('#screen-admin .nav-item.active')?.id?.replace('nav-','');
+  if(s==='students')openAddStudentModal();
+  else if(s==='courses')openAddCourseModal();
+  else if(s==='faculty')openAddFacultyModal();
+  else if(s==='enrollments')openAddEnrollmentModal();
+  else if(s==='grades')openAddGradeModal();
+  else if(s==='fees')openAddFeeModal();
+}
+
+function renderDashboard(){
+  document.getElementById('dash-students').textContent=DB.students.length;
+  document.getElementById('dash-courses').textContent=DB.courses.length;
+  document.getElementById('dash-faculty').textContent=DB.faculty.length;
+  document.getElementById('dash-enrollments').textContent=DB.enrollments.filter(e=>e.status==='Active').length;
+  const recent=DB.enrollments.slice(-5).reverse();
+  document.getElementById('dash-recent-enroll').innerHTML=recent.map(e=>{
+    const stu=DB.students.find(s=>s.id===e.studentId);
+    const crs=DB.courses.find(c=>c.id===e.courseId);
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div class="avatar avatar-blue" style="width:30px;height:30px;font-size:11px">${stu?stu.name.split(' ').map(n=>n[0]).join(''):'?'}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:500">${stu?stu.name:'Unknown'}</div><div style="font-size:11px;color:var(--text2)">${crs?crs.name:'Unknown'}</div></div>
+      <div style="font-size:11px;color:var(--text2)">${e.semester}</div>
+    </div>`;
+  }).join('');
+  const depts={};DB.students.forEach(s=>{depts[s.dept]=(depts[s.dept]||0)+1;});
+  const colors=['var(--accent)','var(--green)','var(--gold)','var(--purple)','var(--red)'];
+  document.getElementById('dash-dept-dist').innerHTML=Object.entries(depts).map(([d,c],i)=>`
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>${d}</span><span style="color:var(--text2)">${c}</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${(c/DB.students.length)*100}%;background:${colors[i%colors.length]}"></div></div>
+    </div>`).join('');
+  const paid=DB.fees.filter(f=>f.status==='Paid').reduce((a,f)=>a+f.amount,0);
+  const pend=DB.fees.filter(f=>f.status!=='Paid').reduce((a,f)=>a+f.amount,0);
+  document.getElementById('dash-fees-overview').innerHTML=`
+    <div style="display:flex;gap:20px;flex-wrap:wrap">
+      <div><div style="font-size:22px;font-weight:700;color:var(--green)">₹${paid.toLocaleString()}</div><div style="font-size:12px;color:var(--text2)">Collected</div></div>
+      <div><div style="font-size:22px;font-weight:700;color:var(--red)">₹${pend.toLocaleString()}</div><div style="font-size:12px;color:var(--text2)">Pending</div></div>
+      <div style="flex:1;align-self:center">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Collection Rate</div>
+        <div class="progress-bar" style="height:12px"><div class="progress-fill" style="width:${Math.round((paid/(paid+pend))*100)}%;background:var(--green)"></div></div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">${Math.round((paid/(paid+pend))*100)}%</div>
+      </div>
+    </div>`;
+}
+
+function gradeClass(g){if(g.startsWith('A'))return 'grade-a';if(g.startsWith('B'))return 'grade-b';if(g.startsWith('C'))return 'grade-c';if(g.startsWith('D'))return 'grade-d';return 'grade-f';}
+
+function renderStudents(){
+  const search=document.getElementById('search-students').value.toLowerCase();
+  const dept=document.getElementById('filter-dept').value;
+  const depts=[...new Set(DB.students.map(s=>s.dept))];
+  const sel=document.getElementById('filter-dept');
+  if(sel.options.length<=1){depts.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;sel.appendChild(o);});}
+  const filtered=DB.students.filter(s=>{
+    const match=s.name.toLowerCase().includes(search)||s.id.toLowerCase().includes(search)||s.email.toLowerCase().includes(search);
+    const dm=!dept||s.dept===dept;return match&&dm;});
+  document.getElementById('students-tbody').innerHTML=filtered.map(s=>`
+    <tr>
+      <td><div style="display:flex;align-items:center;gap:10px">
+        <div class="avatar avatar-blue" style="width:30px;height:30px;font-size:11px">${s.name.split(' ').map(n=>n[0]).join('')}</div>
+        <div><div style="font-size:13px;font-weight:500">${s.name}</div><div style="font-size:11px;color:var(--text2)">${s.email}</div></div></div></td>
+      <td><span class="badge badge-blue">${s.id}</span></td>
+      <td>${s.dept}</td><td>Year ${s.year}</td>
+      <td style="font-weight:600;color:${s.cgpa>=9?'#34d399':s.cgpa>=7?'#60a5fa':'#f87171'}">${s.cgpa}</td>
+      <td><span class="badge ${s.status==='Active'?'badge-green':'badge-red'}">${s.status}</span></td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="viewStudent('${s.id}')">View</button>
+        <button class="btn btn-primary" style="padding:4px 10px;font-size:12px" onclick="editStudent('${s.id}')">Edit</button>
+        <button class="btn btn-danger" style="padding:4px 10px;font-size:12px" onclick="deleteStudent('${s.id}')">Del</button>
+      </div></td></tr>`).join('');
+}
+
+function renderCourses(){
+  document.getElementById('courses-tbody').innerHTML=DB.courses.map(c=>{
+    const fac=DB.faculty.find(f=>f.id===c.faculty);
+    const pct=Math.round((c.enrolled/c.seats)*100);
+    return`<tr>
+      <td><div style="font-size:13px;font-weight:500">${c.name}</div><div style="font-size:11px;color:var(--text2)">${c.schedule}</div></td>
+      <td><span class="badge badge-purple">${c.id}</span></td>
+      <td>${c.dept}</td><td>${c.credits} cr</td>
+      <td>${fac?fac.name:'—'}</td>
+      <td><div style="font-size:12px;margin-bottom:4px">${c.enrolled}/${c.seats} <span style="color:var(--text3)">(${pct}%)</span></div>
+        <div class="progress-bar" style="width:80px"><div class="progress-fill" style="width:${pct}%;background:${pct>90?'var(--red)':pct>70?'var(--gold)':'var(--green)'}"></div></div></td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn btn-primary" style="padding:4px 10px;font-size:12px" onclick="editCourse('${c.id}')">Edit</button>
+        <button class="btn btn-danger" style="padding:4px 10px;font-size:12px" onclick="deleteCourse('${c.id}')">Del</button>
+      </div></td></tr>`;}).join('');
+}
+
+function renderFaculty(){
+  document.getElementById('faculty-tbody').innerHTML=DB.faculty.map(f=>`
+    <tr>
+      <td><div style="display:flex;align-items:center;gap:10px">
+        <div class="avatar avatar-purple" style="width:30px;height:30px;font-size:11px">${f.name.split(' ').filter((_,i)=>i<2).map(n=>n[0]).join('')}</div>
+        <div><div style="font-size:13px;font-weight:500">${f.name}</div><div style="font-size:11px;color:var(--text2)">${f.email}</div></div></div></td>
+      <td><span class="badge badge-gold">${f.id}</span></td>
+      <td>${f.dept}</td><td>${f.designation}</td>
+      <td>${f.courses.length} course(s)</td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn btn-primary" style="padding:4px 10px;font-size:12px" onclick="editFaculty('${f.id}')">Edit</button>
+        <button class="btn btn-danger" style="padding:4px 10px;font-size:12px" onclick="deleteFaculty('${f.id}')">Del</button>
+      </div></td></tr>`).join('');
+}
+
+function renderEnrollments(){
+  document.getElementById('enrollments-tbody').innerHTML=DB.enrollments.map(e=>{
+    const stu=DB.students.find(s=>s.id===e.studentId);
+    const crs=DB.courses.find(c=>c.id===e.courseId);
+    return`<tr>
+      <td>${stu?stu.name:'Unknown'}</td>
+      <td>${crs?`${crs.name} <span style="color:var(--text2);font-size:11px">(${crs.id})</span>`:'Unknown'}</td>
+      <td>${e.semester}</td><td>${e.date}</td>
+      <td><span class="badge ${e.status==='Active'?'badge-green':e.status==='Dropped'?'badge-red':'badge-gold'}">${e.status}</span></td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn btn-danger" style="padding:4px 10px;font-size:12px" onclick="dropEnrollment('${e.id}')">Drop</button>
+      </div></td></tr>`;}).join('');
+}
+
+function renderGrades(){
+  const filter=document.getElementById('grade-filter-course').value;
+  const sel=document.getElementById('grade-filter-course');
+  if(sel.options.length<=1){DB.courses.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;sel.appendChild(o);});}
+  const filtered=filter?DB.grades.filter(g=>g.courseId===filter):DB.grades;
+  document.getElementById('grades-tbody').innerHTML=filtered.map(g=>{
+    const stu=DB.students.find(s=>s.id===g.studentId);
+    const crs=DB.courses.find(c=>c.id===g.courseId);
+    return`<tr>
+      <td>${stu?stu.name:'Unknown'}</td>
+      <td>${crs?crs.name:'Unknown'}</td>
+      <td><div style="display:flex;align-items:center;gap:8px"><span>${g.marks}/100</span>
+        <div class="progress-bar" style="width:60px"><div class="progress-fill" style="width:${g.marks}%;background:${g.marks>=90?'var(--green)':g.marks>=75?'var(--accent)':g.marks>=60?'var(--gold)':'var(--red)'}"></div></div>
+      </div></td>
+      <td><span class="${gradeClass(g.grade)}">${g.grade}</span></td>
+      <td>${g.semester}</td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn btn-primary" style="padding:4px 10px;font-size:12px" onclick="editGrade('${g.id}')">Edit</button>
+        <button class="btn btn-danger" style="padding:4px 10px;font-size:12px" onclick="deleteGrade('${g.id}')">Del</button>
+      </div></td></tr>`;}).join('');
+}
+
+function renderFees(){
+  const paid=DB.fees.filter(f=>f.status==='Paid').reduce((a,f)=>a+f.amount,0);
+  const pend=DB.fees.filter(f=>f.status!=='Paid').reduce((a,f)=>a+f.amount,0);
+  document.getElementById('fee-collected').textContent='₹'+paid.toLocaleString();
+  document.getElementById('fee-pending').textContent='₹'+pend.toLocaleString();
+  document.getElementById('fee-students').textContent=DB.fees.length;
+  document.getElementById('fees-tbody').innerHTML=DB.fees.map(f=>{
+    const stu=DB.students.find(s=>s.id===f.studentId);
+    return`<tr>
+      <td>${stu?stu.name:'Unknown'}</td>
+      <td style="font-weight:600">₹${f.amount.toLocaleString()}</td>
+      <td>${f.dueDate}</td><td>${f.paidDate||'—'}</td>
+      <td><span class="badge ${f.status==='Paid'?'badge-green':f.status==='Overdue'?'badge-red':'badge-gold'}">${f.status}</span></td>
+      <td><div style="display:flex;gap:6px">
+        ${f.status!=='Paid'?`<button class="btn btn-success" style="padding:4px 10px;font-size:12px" onclick="markFeePaid('${f.id}')">Mark Paid</button>`:''}
+        <button class="btn btn-danger" style="padding:4px 10px;font-size:12px" onclick="deleteFee('${f.id}')">Del</button>
+      </div></td></tr>`;}).join('');
+}
+
+// MODALS
+function openModal(title,body,footer){
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-body').innerHTML=body;
+  document.getElementById('modal-footer').innerHTML=footer;
+  document.getElementById('modal-overlay').style.display='flex';
+}
+function closeModal(){document.getElementById('modal-overlay').style.display='none';}
+
+function fieldHTML(label,id,type,val,opts){
+  if(type==='select'){
+    return`<div class="form-row"><label class="form-label">${label}</label>
+      <select id="f-${id}">${opts.map(o=>`<option value="${o}" ${o===val?'selected':''}>${o}</option>`).join('')}</select></div>`;
+  }
+  return`<div class="form-row"><label class="form-label">${label}</label>
+    <input type="${type}" id="f-${id}" value="${val||''}" placeholder="${label}"></div>`;
+}
+
+function openAddStudentModal(){
+  const body=fieldHTML('Full Name','name','text','')+fieldHTML('Email','email','email','')+
+    fieldHTML('Phone','phone','text','')+fieldHTML('Department','dept','select','',['Computer Science','Electronics','Mechanical','Civil'])+
+    fieldHTML('Year','year','number','')+fieldHTML('Date of Birth','dob','date','')+
+    fieldHTML('Address','address','text','')+fieldHTML('Password','password','text','');
+  openModal('Add New Student',body,`<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveNewStudent()">Add Student</button>`);
+}
+function saveNewStudent(){
+  const id='STU'+String(DB.students.length+1).padStart(3,'0');
+  const s={id,name:val('name'),email:val('email'),phone:val('phone'),dept:val('dept'),year:+val('year')||1,cgpa:0,dob:val('dob'),address:val('address'),status:'Active',password:val('password')||id.toLowerCase()};
+  if(!s.name||!s.email){alert('Name and Email are required');return;}
+  DB.students.push(s);renderStudents();closeModal();renderDashboard();
+}
+
+function viewStudent(id){
+  const s=DB.students.find(x=>x.id===id);if(!s)return;
+  const enr=DB.enrollments.filter(e=>e.studentId===id);
+  const gr=DB.grades.filter(g=>g.studentId===id);
+  const fee=DB.fees.find(f=>f.studentId===id);
+  const body=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+    ${[['Student ID',s.id],['Department',s.dept],['Year','Year '+s.year],['CGPA',s.cgpa],['Email',s.email],['Phone',s.phone],['Status',s.status],['DOB',s.dob]].map(([l,v])=>`<div><div style="font-size:11px;color:var(--text2)">${l}</div><div style="font-size:13px;font-weight:500;margin-top:2px">${v}</div></div>`).join('')}
+  </div>
+  <div style="font-size:13px;font-weight:600;margin-bottom:8px">Enrolled Courses (${enr.length})</div>
+  ${enr.map(e=>{const c=DB.courses.find(x=>x.id===e.courseId);return`<div style="font-size:12px;padding:4px 0;color:var(--text2)">${c?c.name:e.courseId} — ${e.semester}</div>`;}).join('')||'<div style="font-size:12px;color:var(--text3)">No enrollments</div>'}
+  <div style="font-size:13px;font-weight:600;margin:12px 0 8px">Grades</div>
+  ${gr.map(g=>{const c=DB.courses.find(x=>x.id===g.courseId);return`<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0"><span>${c?c.name:g.courseId}</span><span class="${gradeClass(g.grade)}">${g.grade} (${g.marks})</span></div>`;}).join('')||'<div style="font-size:12px;color:var(--text3)">No grades</div>'}`;
+  openModal(`Student: ${s.name}`,body,`<button class="btn btn-ghost" onclick="closeModal()">Close</button><button class="btn btn-primary" onclick="closeModal();editStudent('${id}')">Edit</button>`);
+}
+
+function editStudent(id){
+  const s=DB.students.find(x=>x.id===id);if(!s)return;
+  const body=fieldHTML('Full Name','name','text',s.name)+fieldHTML('Email','email','email',s.email)+
+    fieldHTML('Phone','phone','text',s.phone)+fieldHTML('Department','dept','select',s.dept,['Computer Science','Electronics','Mechanical','Civil'])+
+    fieldHTML('Year','year','number',s.year)+fieldHTML('CGPA','cgpa','number',s.cgpa)+
+    fieldHTML('Status','status','select',s.status,['Active','Inactive'])+fieldHTML('Address','address','text',s.address);
+  openModal('Edit Student',body,`<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="updateStudent('${id}')">Save</button>`);
+}
+function updateStudent(id){
+  const s=DB.students.find(x=>x.id===id);if(!s)return;
+  s.name=val('name');s.email=val('email');s.phone=val('phone');s.dept=val('dept');s.year=+val('year');s.cgpa=+val('cgpa');s.status=val('status');s.address=val('address');
+  renderStudents();closeModal();
+}
+function deleteStudent(id){
+  if(!confirm('Delete this student?'))return;
+  const i=DB.students.findIndex(x=>x.id===id);if(i>-1)DB.students.splice(i,1);
+  renderStudents();renderDashboard();
+}
+
+function openAddCourseModal(){
+  const facOpts=DB.faculty.map(f=>f.id);
+  const body=fieldHTML('Course Name','name','text','')+fieldHTML('Course Code','id','text','')+
+    fieldHTML('Department','dept','select','',['Computer Science','Electronics','Mechanical','Civil'])+
+    fieldHTML('Credits','credits','number','')+fieldHTML('Faculty ID','faculty','select','',facOpts)+
+    fieldHTML('Total Seats','seats','number','')+fieldHTML('Schedule','schedule','text','');
+  openModal('Add New Course',body,`<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveNewCourse()">Add Course</button>`);
+}
+function saveNewCourse(){
+  const c={id:val('id'),name:val('name'),dept:val('dept'),credits:+val('credits')||3,faculty:val('faculty'),seats:+val('seats')||60,enrolled:0,schedule:val('schedule')};
+  if(!c.id||!c.name){alert('Code and Name required');return;}
+  DB.courses.push(c);renderCourses();closeModal();renderDashboard();
+}
+function editCourse(id){
+  const c=DB.courses.find(x=>x.id===id);if(!c)return;
+  const facOpts=DB.faculty.map(f=>f.id);
+  const body=fieldHTML('Course Name','name','text',c.name)+fieldHTML('Department','dept','select',c.dept,['Computer Science','Electronics','Mechanical','Civil'])+
+    fieldHTML('Credits','credits','number',c.credits)+fieldHTML('Faculty','faculty','select',c.faculty,facOpts)+
+    fieldHTML('Total Seats','seats','number',c.seats)+fieldHTML('Schedule','schedule','text',c.schedule);
+  openModal('Edit Course',body,`<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="updateCourse('${id}')">Save</button>`);
+}
+function updateCourse(id){
+  const c=DB.courses.find(x=>x.id===id);if(!c)return;
+  c.name=val('name');c.dept=val('dept');c.credits=+val('credits');c.faculty=val('faculty');c.seats=+val('seats');c.schedule=val('schedule');
+  renderCourses();closeModal();
+}
+function deleteCourse(id){
+  if(!confirm('Delete this course?'))return;
+  const i=DB.courses.findIndex(x=>x.id===id);if(i>-1)DB.courses.splice(i,1);renderCourses();
+}
+
+function openAddFacultyModal(){
+  const body=fieldHTML('Full Name','name','text','')+fieldHTML('Email','email','email','')+
+    fieldHTML('Department','dept','select','',['Computer Science','Electronics','Mechanical','Civil'])+
+    fieldHTML('Designation','designation','select','',['Professor','Assoc. Professor','Asst. Professor']);
+  openModal('Add Faculty',body,`<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveNewFaculty()">Add Faculty</button>`);
+}
+function saveNewFaculty(){
+  const id='FAC'+String(DB.faculty.length+1).padStart(3,'0');
+  DB.faculty.push({id,name:val('name'),email:val('email'),dept:val('dept'),designation:val('designation'),courses:[]});
+  renderFaculty();closeModal();renderDashboard();
+}
+function editFaculty(id){
+  const f=DB.faculty.find(x=>x.id===id);if(!f)return;
+  const body=fieldHTML('Full Name','name','text',f.name)+fieldHTML('Email','email','email',f.email)+
+    fieldHTML('Department','dept','select',f.dept,['Computer Science','Electronics','Mechanical','Civil'])+
+    fieldHTML('Designation','designation','select',f.designation,['Professor','Assoc. Professor','Asst. Professor']);
+  openModal('Edit Faculty',body,`<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="updateFaculty('${id}')">Save</button>`);
+}
+function updateFaculty(id){
+  const f=DB.faculty.find(x=>x.id===id);if(!f)return;
+  f.name=val('name');f.email=val('email');f.dept=val('dept');f.designation=val('designation');
+  renderFaculty();closeModal();
+}
+function deleteFaculty(id){
+  if(!confirm('Delete this faculty?'))return;
+  const i=DB.faculty.findIndex(x=>x.id===id);if(i>-1)DB.faculty.splice(i,1);renderFaculty();
+}
+
+function openAddEnrollmentModal(){
+  const stuOpts=DB.students.map(s=>s.id);
+  const crsOpts=DB.courses.map(c=>c.id);
+  const body=fieldHTML('Student','studentId','select','',stuOpts)+fieldHTML('Course','courseId','select','',crsOpts)+
+    fieldHTML('Semester','semester','text','')+fieldHTML('Date','date','date','');
+  openModal('New Enrollment',body,`<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveNewEnrollment()">Enroll</button>`);
+}
+function saveNewEnrollment(){
+  const e={id:'ENR'+String(DB.enrollments.length+1).padStart(3,'0'),studentId:val('studentId'),courseId:val('courseId'),semester:val('semester'),date:val('date'),status:'Active'};
+  DB.enrollments.push(e);renderEnrollments();closeModal();renderDashboard();
+}
+function dropEnrollment(id){
+  const e=DB.enrollments.find(x=>x.id===id);if(e)e.status='Dropped';renderEnrollments();
+}
+
+function openAddGradeModal(){
+  const stuOpts=DB.students.map(s=>s.id);
+  const crsOpts=DB.courses.map(c=>c.id);
+  const body=fieldHTML('Student','studentId','select','',stuOpts)+fieldHTML('Course','courseId','select','',crsOpts)+
+    fieldHTML('Marks (0-100)','marks','number','')+fieldHTML('Semester','semester','text','');
+  openModal('Add Grade',body,`<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveNewGrade()">Save Grade</button>`);
+}
+function calcGrade(m){if(m>=90)return{g:'A+',p:10};if(m>=80)return{g:'A',p:9};if(m>=70)return{g:'B+',p:8};if(m>=60)return{g:'B',p:7};if(m>=50)return{g:'C',p:6};return{g:'F',p:0};}
+function saveNewGrade(){
+  const marks=+val('marks');const {g,p}=calcGrade(marks);
+  const gr={id:'GRD'+String(DB.grades.length+1).padStart(3,'0'),studentId:val('studentId'),courseId:val('courseId'),marks,grade:g,points:p,semester:val('semester')};
+  DB.grades.push(gr);renderGrades();closeModal();
+}
+function editGrade(id){
+  const g=DB.grades.find(x=>x.id===id);if(!g)return;
+  const body=fieldHTML('Marks (0-100)','marks','number',g.marks)+fieldHTML('Semester','semester','text',g.semester);
+  openModal('Edit Grade',body,`<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="updateGrade('${id}')">Save</button>`);
+}
+function updateGrade(id){
+  const g=DB.grades.find(x=>x.id===id);if(!g)return;
+  const m=+val('marks');const {grade,p}=calcGrade(m);g.marks=m;g.grade=grade;g.points=p;g.semester=val('semester');
+  renderGrades();closeModal();
+}
+function deleteGrade(id){const i=DB.grades.findIndex(x=>x.id===id);if(i>-1)DB.grades.splice(i,1);renderGrades();}
+
+function openAddFeeModal(){
+  const stuOpts=DB.students.map(s=>s.id);
+  const body=fieldHTML('Student','studentId','select','',stuOpts)+fieldHTML('Amount (₹)','amount','number','')+
+    fieldHTML('Due Date','dueDate','date','')+fieldHTML('Status','status','select','',['Pending','Paid','Overdue']);
+  openModal('Add Fee Record',body,`<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveNewFee()">Add</button>`);
+}
+function saveNewFee(){
+  const f={id:'FEE'+String(DB.fees.length+1).padStart(3,'0'),studentId:val('studentId'),amount:+val('amount'),dueDate:val('dueDate'),paidDate:null,status:val('status')};
+  DB.fees.push(f);renderFees();closeModal();
+}
+function markFeePaid(id){
+  const f=DB.fees.find(x=>x.id===id);if(f){f.status='Paid';f.paidDate=new Date().toISOString().split('T')[0];}renderFees();
+}
+function deleteFee(id){const i=DB.fees.findIndex(x=>x.id===id);if(i>-1)DB.fees.splice(i,1);renderFees();}
+
+function val(id){const el=document.getElementById('f-'+id);return el?el.value:'';}
+
+// STUDENT PORTAL
+function studentNav(section){
+  const titles={profile:'My Profile',courses:'My Courses',grades:'My Grades',fees:'My Fees',timetable:'Timetable'};
+  document.getElementById('student-page-title').textContent=titles[section];
+  document.querySelectorAll('#screen-student .nav-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('snav-'+section).classList.add('active');
+  document.querySelectorAll('#screen-student .section').forEach(el=>el.classList.remove('active'));
+  document.getElementById('ssec-'+section).classList.add('active');
+  if(section==='courses')renderStudentCourses();
+  if(section==='grades')renderStudentGrades();
+  if(section==='fees')renderStudentFees();
+  if(section==='timetable')renderStudentTimetable();
+}
+
+function renderStudentPortal(){
+  const s=DB.currentUser;
+  const initials=s.name.split(' ').map(n=>n[0]).join('');
+  document.getElementById('student-avatar-topbar').textContent=initials;
+  document.getElementById('student-topbar-name').textContent=s.name;
+  document.getElementById('s-avatar-big').textContent=initials;
+  document.getElementById('s-name').textContent=s.name;
+  document.getElementById('s-id-disp').textContent=s.id;
+  document.getElementById('s-status-badge').innerHTML=`<span class="badge ${s.status==='Active'?'badge-green':'badge-red'}">${s.status}</span>`;
+  document.getElementById('s-info-grid').innerHTML=[
+    ['Department',s.dept],['Year of Study','Year '+s.year],['Email',s.email],['Phone',s.phone],
+    ['Date of Birth',s.dob],['Address',s.address],['CGPA',s.cgpa],['Student ID',s.id]
+  ].map(([l,v])=>`<div style="padding:8px;background:var(--navy3);border-radius:8px"><div style="font-size:11px;color:var(--text2)">${l}</div><div style="font-size:13px;font-weight:500;margin-top:2px">${v}</div></div>`).join('');
+  const enrs=DB.enrollments.filter(e=>e.studentId===s.id&&e.status==='Active').length;
+  const grs=DB.grades.filter(g=>g.studentId===s.id);
+  const avgMarks=grs.length?Math.round(grs.reduce((a,g)=>a+g.marks,0)/grs.length):0;
+  const fee=DB.fees.find(f=>f.studentId===s.id);
+  document.getElementById('s-stats-row').innerHTML=[
+    ['Courses Enrolled',enrs,'var(--accent)'],
+    ['Average Marks',avgMarks+'%','var(--green)'],
+    ['CGPA',s.cgpa,'var(--gold)'],
+    ['Fee Status',fee?fee.status:'N/A',fee&&fee.status==='Paid'?'var(--green)':fee&&fee.status==='Overdue'?'var(--red)':'var(--gold)']
+  ].map(([l,v,c])=>`<div class="stat-card"><div class="stat-val" style="color:${c};font-size:22px">${v}</div><div class="stat-lbl">${l}</div></div>`).join('');
+}
+
+function renderStudentCourses(){
+  const s=DB.currentUser;
+  const enrs=DB.enrollments.filter(e=>e.studentId===s.id&&e.status==='Active');
+  document.getElementById('s-courses-tbody').innerHTML=enrs.map(e=>{
+    const c=DB.courses.find(x=>x.id===e.courseId);
+    const fac=c?DB.faculty.find(f=>f.id===c.faculty):null;
+    if(!c)return'';
+    return`<tr><td><div style="font-size:13px;font-weight:500">${c.name}</div></td>
+      <td><span class="badge badge-purple">${c.id}</span></td>
+      <td>${c.credits} credits</td>
+      <td>${fac?fac.name:'—'}</td>
+      <td style="font-size:12px;color:var(--text2)">${c.schedule}</td>
+      <td><span class="badge badge-green">Active</span></td></tr>`;}).join('');
+}
+
+function renderStudentGrades(){
+  const s=DB.currentUser;
+  const grs=DB.grades.filter(g=>g.studentId===s.id);
+  const cgpa=grs.length?+(grs.reduce((a,g)=>a+g.points,0)/grs.length).toFixed(1):0;
+  document.getElementById('s-cgpa').textContent=cgpa;
+  document.getElementById('s-gpa-bar').style.width=(cgpa/10*100)+'%';
+  document.getElementById('s-grades-tbody').innerHTML=grs.map(g=>{
+    const c=DB.courses.find(x=>x.id===g.courseId);
+    return`<tr><td>${c?c.name:g.courseId}</td>
+      <td><div style="display:flex;align-items:center;gap:8px"><span>${g.marks}/100</span>
+        <div class="progress-bar" style="width:60px"><div class="progress-fill" style="width:${g.marks}%;background:${g.marks>=90?'var(--green)':g.marks>=75?'var(--accent)':g.marks>=60?'var(--gold)':'var(--red)'}"></div></div></div></td>
+      <td><span class="${gradeClass(g.grade)}">${g.grade}</span></td>
+      <td>${g.points}/10</td><td>${g.semester}</td></tr>`;}).join('');
+}
+
+function renderStudentFees(){
+  const s=DB.currentUser;
+  const fee=DB.fees.find(f=>f.studentId===s.id);
+  if(!fee){document.getElementById('s-fees-content').innerHTML='<div class="card" style="text-align:center;color:var(--text2)">No fee records found</div>';return;}
+  document.getElementById('s-fees-content').innerHTML=`
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div><div style="font-size:22px;font-weight:700">₹${fee.amount.toLocaleString()}</div><div style="font-size:12px;color:var(--text2)">Total Fee</div></div>
+        <span class="badge ${fee.status==='Paid'?'badge-green':fee.status==='Overdue'?'badge-red':'badge-gold'}" style="font-size:14px;padding:6px 16px">${fee.status}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        ${[['Due Date',fee.dueDate],['Paid Date',fee.paidDate||'Not yet paid'],['Student ID',s.id],['Academic Year','2024-25']].map(([l,v])=>`<div style="padding:10px;background:var(--navy3);border-radius:8px"><div style="font-size:11px;color:var(--text2)">${l}</div><div style="font-size:13px;font-weight:500;margin-top:2px">${v}</div></div>`).join('')}
+      </div>
+      ${fee.status!=='Paid'?`<button class="btn btn-success" style="width:100%;margin-top:16px;padding:12px" onclick="studentPayFee('${fee.id}')">Pay Now ₹${fee.amount.toLocaleString()}</button>`:'<div style="text-align:center;margin-top:16px;color:var(--green);font-size:14px;font-weight:600">✓ Fee Paid Successfully</div>'}
+    </div>`;
+}
+
+function studentPayFee(id){
+  const f=DB.fees.find(x=>x.id===id);if(f){f.status='Paid';f.paidDate=new Date().toISOString().split('T')[0];}
+  renderStudentFees();
+}
+
+function renderStudentTimetable(){
+  const s=DB.currentUser;
+  const enrs=DB.enrollments.filter(e=>e.studentId===s.id&&e.status==='Active');
+  const days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  const slots={};
+  enrs.forEach(e=>{
+    const c=DB.courses.find(x=>x.id===e.courseId);if(!c)return;
+    const sc=c.schedule;
+    days.forEach(d=>{
+      if(sc.includes(d.substring(0,3))){
+        if(!slots[d])slots[d]=[];
+        slots[d].push({course:c.name,code:c.id,time:sc.split(' ').slice(-1)[0]});
+      }
+    });
+  });
+  document.getElementById('s-timetable-content').innerHTML=`<div class="card">
+    <div style="font-size:14px;font-weight:700;margin-bottom:14px">Weekly Schedule</div>
+    ${days.map(d=>`<div style="margin-bottom:10px">
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">${d}</div>
+      ${slots[d]?slots[d].map(s=>`<div style="display:inline-flex;align-items:center;gap:8px;background:var(--navy3);border:1px solid var(--border);border-radius:8px;padding:6px 12px;margin-right:8px;margin-bottom:4px">
+        <span style="font-size:12px;font-weight:500">${s.course}</span>
+        <span style="font-size:11px;color:var(--text2)">${s.time}</span>
+      </div>`).join(''):'<span style="font-size:12px;color:var(--text3)">No classes</span>'}
+    </div>`).join('')}
+  </div>`;
+}
+
+document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+</script>
